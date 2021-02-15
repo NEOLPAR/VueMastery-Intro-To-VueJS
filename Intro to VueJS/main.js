@@ -17,6 +17,10 @@ Vue.component('product', {
     premium: {
       type: Boolean, 
       required: true
+    },
+    cart: {
+      type: Number,
+      required: true
     }
   },
   template: `
@@ -57,10 +61,6 @@ Vue.component('product', {
       <button @click="removeFromCart"
             :disabled="cart === 0"
             :class="{ disabledButton: cart === 0 }">Remove from cart</button>
-
-      <div class="cart">
-        <p>Cart {{cart}}</p>
-      </div>
     </div>
     
   </div>
@@ -87,16 +87,15 @@ Vue.component('product', {
           onSale: false
         }
       ],
-      sizes: [5, 6, 7, 8, 9],
-      cart: 0
+      sizes: [5, 6, 7, 8, 9]
     };
   },
   methods: {
     removeFromCart: function() {
-      this.cart = this.cart > 0 ? this.cart - 1 : 0;
+      this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
     },
     addToCart: function () {
-      this.cart += 1;
+      this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
     },
     updateProduct: function(idx) {
       this.selectedVariant = idx;
@@ -129,6 +128,18 @@ Vue.component('product', {
 var app = new Vue({
   el: '#app',
   data: {
-    premium: false
-  }
+    premium: false,
+    cart: []
+  },
+  methods: {
+    removeFromCart: function(id) {
+      var idx = this.cart.indexOf(id);
+      if (idx > -1) {
+        this.cart.splice(idx, 1);
+      }
+    },
+    addToCart: function (id) {
+      this.cart.push(id);
+    },
+  },
 });
